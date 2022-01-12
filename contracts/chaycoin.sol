@@ -171,18 +171,8 @@ contract ChayCoinICO is ChayCoin{
    receive () payable external{
         invest();
     }
-  
     
-    // burning unsold tokens. But the beauty of ChayCoin is that Chiedo can always mint more.
-    function burn() public returns(bool){
-        icoState = getCurrentState();
-        require(icoState == State.afterEnd);
-        balances[founder] = 0;
-        return true;
-        
-    }
-    
-    
+   
     function transfer(address to, uint tokens) public override returns (bool success){
         require(block.timestamp > tokenTradeStart);
         
