@@ -60,7 +60,7 @@ contract ChayCoin is ERC20Interface{
     }
     
     
-    function approve(address spender, uint tokens) public override returns (bool success){
+    function approve(address spender, uint tokens) public virtual override returns (bool success){
         require(balances[msg.sender] >= tokens);
         require(tokens > 0);
         
@@ -71,7 +71,7 @@ contract ChayCoin is ERC20Interface{
     }
     
     
-    function transferFrom(address from, address to, uint tokens) public override returns (bool success){
+    function transferFrom(address from, address to, uint tokens) public virtual override returns (bool success){
          require(allowed[from][to] >= tokens);
          require(balances[from] >= tokens);
          
