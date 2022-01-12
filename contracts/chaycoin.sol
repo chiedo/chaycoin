@@ -23,7 +23,7 @@ interface ERC20Interface {
 contract ChayCoin is ERC20Interface{
     string public name = "ChayCoin";
     string public symbol = "CHAY";
-    uint public decimals = 0
+    uint public decimals = 0;
     uint public override totalSupply;
     
     address public founder;
