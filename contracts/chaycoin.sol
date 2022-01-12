@@ -100,8 +100,8 @@ contract ChayCoinICO is ChayCoin{
     enum State { beforeStart, running, afterEnd, halted} // ICO states 
     State public icoState;
     
-    constructor(address payable _deposit){
-        deposit = _deposit; 
+    constructor(address payable _depositAddress){
+        deposit = _depositAddress; 
         admin = msg.sender; 
         icoState = State.beforeStart;
     }
