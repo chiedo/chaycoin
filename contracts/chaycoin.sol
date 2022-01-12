@@ -83,3 +83,120 @@ contract ChayCoin is ERC20Interface{
          return true;
      }
 }
+
+contract ChayCoinICO is ChayCoin{
+    address public admin;
+    address payable public deposit;
+    uint tokenPrice = 1 ether;
+    uint public hardCap = 1000000 ether;
+    uint public raisedAmount; // this value will be in wei
+    uint public saleStart = block.timestamp;
+    uint public saleEnd = block.timestamp + 604800; //one week
+    
+    uint public tokenTradeStart = saleEnd + 604800; //transferable in a week after saleEnd
+    uint public maxInvestment = 100 ether;
+    uint public minInvestment = 1 ether;
+    
+    enum State { beforeStart, running, afterEnd, halted} // ICO states 
+    State public icoState;
+    
+    constructor(address payable _deposit){
+        deposit = _deposit; 
+        admin = msg.sender; 
+        icoState = State.beforeStart;
+    }
+ 
+    
+    modifier onlyAdmin(){
+        require(msg.sender == admin);
+        _;
+    }
+    
+    
+    // emergency stop
+    function halt() public onlyAdmin{
+        icoState = State.halted;
+    }
+    
+    
+    function resume() public onlyAdmin{
+        icoState = State.running;
+    }
+    
+    
+    function changeDepositAddress(address payable newDeposit) public onlyAdmin{
+        deposit = newDeposit;
+    }
+    
+    
+    function getCurrentState() public view returns(State){
+        if(icoState == State.halted){
+            return State.halted;
+        }else if(block.timestamp < saleStart){
+            return State.beforeStart;
+        }else if(block.timestamp >= saleStart && block.timestamp <= saleEnd){
+            return State.running;
+        }else{
+            return State.afterEnd;
+        }
+    }
+ 
+ 
+    event Invest(address investor, uint value, uint tokens);
+    
+    
+    // function called when sending eth to the contract
+    function invest() payable public returns(bool){ 
+        icoState = getCurrentState();
+        require(icoState == State.running);
+        require(msg.value >= minInvestment && msg.value <= maxInvestment);
+        
+        raisedAmount += msg.value;
+        require(raisedAmount <= hardCap);
+        
+        uint tokens = msg.value / tokenPrice;
+ 
+        // adding tokens to the inverstor's balance from the founder's balance
+        balances[msg.sender] += tokens;
+        balances[founder] -= tokens; 
+        deposit.transfer(msg.value); // transfering the value sent to the ICO to the deposit address
+        
+        emit Invest(msg.sender, msg.value, tokens);
+        
+        return true;
+    }
+   
+   
+   // this function is called automatically when someone sends ETH to the contract's address
+   receive () payable external{
+        invest();
+    }
+  
+    
+    // burning unsold tokens. But the beauty of ChayCoin is that Chiedo can always mint more.
+    function burn() public returns(bool){
+        icoState = getCurrentState();
+        require(icoState == State.afterEnd);
+        balances[founder] = 0;
+        return true;
+        
+    }
+    
+    
+    function transfer(address to, uint tokens) public override returns (bool success){
+        require(block.timestamp > tokenTradeStart);
+        
+        // calling the transfer function of the base contract
+        super.transfer(to, tokens);
+        return true;
+    }
+    
+    
+    function transferFrom(address from, address to, uint tokens) public override returns (bool success){
+        require(block.timestamp > tokenTradeStart);
+       
+        super.transferFrom(from, to, tokens);
+        return true;
+     
+    }
+}
