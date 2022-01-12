@@ -19,7 +19,8 @@ interface ERC20Interface {
     event Approval(address indexed tokenOwner, address indexed spender, uint tokens);
 }
  
- 
+
+// Deploying this contract is the simplest way to go as it will yield the deployer all of the ChayCoins
 contract ChayCoin is ERC20Interface{
     string public name = "ChayCoin";
     string public symbol = "CHAY";
@@ -84,6 +85,8 @@ contract ChayCoin is ERC20Interface{
      }
 }
 
+// Deploying this contract will launch an ICO which will allow others to buy ChayCoin with
+// ETH
 contract ChayCoinICO is ChayCoin{
     address public admin;
     address payable public deposit;
