@@ -1,6 +1,6 @@
 # ChayCoin 💰
 
-A ERC-20 token for learning purposes and laughs with no value.
+An ERC-20 token with no value for learning purposes and laughs.
 
 ## Credits
 
